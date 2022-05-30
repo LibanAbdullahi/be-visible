@@ -192,20 +192,41 @@ module.exports = function (app) {
       }
     });
 
-    // Coach can Create a company Account
+    // Coach can Create a new company user
     //POST => users/company/new
-    // app.post('/api/users/company/new', (req, res) => {
-    //   const userId = req.params.id;
-    //   const roles = req.body.roles;
-    //   if (roles.includes('coach')) {
-    //     const company = new Company({
-    //       companyId: req.body.companyId,
+    app.post('/api/users/company/new', (req, res) => {
+      const roles = req.body.roles;
+      if (roles.includes('coach')) {
+        const user = new User({
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+          email: req.body.email,
+          password: req.body.password,
+          roles: req.body.roles,
+          id_company: req.body.id_company,
+        });
+        user.save((err, user) => {
+          if (err) {
+            res.status(500).send({ message: err });
+            return;
+          }
+          res.send({ message: 'User created successfully!' });
+        });
+      } else {
+        res
+          .status(401)
+          .send({ message: 'You are not authorized to create a user.' });
+      }
+    });
+
+    //   app.post('/api/users/company/new', (req, res) => {
+    //     const userId = req.params.id;
+    //     const company = new User({
+    //       userId,
     //       company: req.body.company,
-    //       name: req.body.name,
-    //       description: req.body.description,
-    //       date: req.body.date,
-    //       image: req.body.image,
-    //       // id_coach: req.body.id_coach,
+    //       email: req.body.email,
+    //       password: req.body.password,
+    //       // id_role: req.body.id_role,
     //     });
     //     console.log(company);
     //     company.save((err, company) => {
@@ -215,30 +236,6 @@ module.exports = function (app) {
     //       }
     //       res.send({ message: 'Company created successfully!' });
     //     });
-    //   } else {
-    //     res.status(401).send({
-    //       message: 'You are not authorized to create a company Account.',
-    //     });
-    //   }
-    // });
-
-    app.post('/api/users/company/new', (req, res) => {
-      const userId = req.params.id;
-      const company = new User({
-        userId,
-        company: req.body.company,
-        email: req.body.email,
-        password: req.body.password,
-        // id_role: req.body.id_role,
-      });
-      console.log(company);
-      company.save((err, company) => {
-        if (err) {
-          res.status(500).send({ message: err });
-          return;
-        }
-        res.send({ message: 'Company created successfully!' });
-      });
-    });
+    //   });
   });
 };
