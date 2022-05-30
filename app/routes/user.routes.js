@@ -11,11 +11,11 @@ module.exports = function (app) {
 
   app.get('/api/users/all', controller.allAccess);
 
-  app.get(
-    '/api/users/:id/profile',
-    [authJwt.verifyToken],
-    controller.userBoard
-  );
+  // app.get(
+  //   '/api/users/:id/profile',
+  //   [authJwt.verifyToken],
+  //   controller.userBoard
+  // );
 
   app.get(
     '/api/test/mod',

@@ -145,6 +145,25 @@ module.exports = function (app) {
     });
   });
 
+  // Get all informations from one profile
+  //GET => “/users/:id/profile/ make sure access is protected
+  // app.get('/api/users/:id/profile', authJwt.verifyToken, (re
+
+  app.get('/api/users/:id/profile/', authJwt.verifyToken, (req, res) => {
+    const profileId = mongoose.Types.ObjectId(req.params.id);
+    Profile.findById(profileId, (err, profile) => {
+      if (err) {
+        res.status(500).send({ message: err });
+        return;
+      }
+      if (profile) {
+        res.send(profile);
+      } else {
+        res.status(404).send({ message: 'Profile not found!' });
+      }
+    });
+  });
+
   // app.post('/api/users/:id/profile/add_project', (req, res) => {
   //   const userId = mongoose.Types.ObjectId(req.params.id);
 

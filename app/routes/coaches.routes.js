@@ -192,8 +192,36 @@ module.exports = function (app) {
       }
     });
 
-    //Create a company Account
+    // Coach can Create a company Account
     //POST => users/company/new
+    // app.post('/api/users/company/new', (req, res) => {
+    //   const userId = req.params.id;
+    //   const roles = req.body.roles;
+    //   if (roles.includes('coach')) {
+    //     const company = new Company({
+    //       companyId: req.body.companyId,
+    //       company: req.body.company,
+    //       name: req.body.name,
+    //       description: req.body.description,
+    //       date: req.body.date,
+    //       image: req.body.image,
+    //       // id_coach: req.body.id_coach,
+    //     });
+    //     console.log(company);
+    //     company.save((err, company) => {
+    //       if (err) {
+    //         res.status(500).send({ message: err });
+    //         return;
+    //       }
+    //       res.send({ message: 'Company created successfully!' });
+    //     });
+    //   } else {
+    //     res.status(401).send({
+    //       message: 'You are not authorized to create a company Account.',
+    //     });
+    //   }
+    // });
+
     app.post('/api/users/company/new', (req, res) => {
       const userId = req.params.id;
       const company = new User({
