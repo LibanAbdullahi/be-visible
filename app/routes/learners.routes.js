@@ -13,56 +13,72 @@ module.exports = function (app) {
     next();
   });
 
-  //// Create profile only if user is learner
+  //// Create profile only if user is learner in the system
   // POST => “/users/:id/profile/new”
-  app.post('/api/users/:id/profile/new', (req, res) => {
-    const userId = req.params.id;
-    const roles = req.body.roles;
-    if (roles.includes('learner')) {
-      const profile = new Profile({
-        id_user: userId,
-        userinfo: req.body.userinfo,
-        education: req.body.education,
-        experience: req.body.experience,
-        skills: req.body.skills,
-        languages: req.body.languages,
-        interests: req.body.interests,
-        certifications: req.body.certifications,
-        projects: req.body.projects,
-      });
-      console.log(profile);
-      profile.save((err, profile) => {
-        if (err) {
+  app.post(
+    '/api/users/:id/profile/new',
+    [authJwt.verifyToken],
+    async (req, res) => {
+      const user = await User.findById(req.params.id).populate('roles');
+      console.log(user);
+      if (
+        user.roles[0]._id == '62948da8500a9007cf43333a' ||
+        user.roles[0]._id == '62948da8500a9007cf43333b'
+      ) {
+        const profile = await new Profile({
+          userinfo: req.body.userinfo,
+          education: req.body.education,
+          experience: req.body.experience,
+          skills: req.body.skills,
+          languages: req.body.languages,
+          interests: req.body.interests,
+          certifications: req.body.certifications,
+          projects: req.body.projects,
+          id_user: req.params.id,
+          contact: req.body.contact,
+        });
+        try {
+          await profile.save();
+          user.profile = profile._id;
+          await user.save();
+          await res.send({
+            message: `${profile.userinfo}'s profile has been created `,
+          });
+        } catch (err) {
           res.status(500).send({ message: err });
-          return;
         }
-        res.send({ message: 'Profile created successfully!' });
-      });
-    } else {
-      res.status(403).send({ message: 'Forbidden' });
+      } else {
+        res.status(403).send({ message: 'Forbidden' });
+      }
     }
-  });
+  );
 
   // app.post('/api/users/:id/profile/new', (req, res) => {
   //   const userId = req.params.id;
-  //   const profile = new Profile({
-  //     id_user: userId,
-  //     userinfo: req.body.userinfo,
-  //     education: req.body.education,
-  //     experience: req.body.experience,
-  //     skills: req.body.skills,
-  //     languages: req.body.languages,
-  //     certifications: req.body.certifications,
-  //     projects: req.body.projects,
-  //   });
-  //   console.log(profile);
-  //   profile.save((err, profile) => {
-  //     if (err) {
-  //       res.status(500).send({ message: err });
-  //       return;
-  //     }
-  //     res.send({ message: 'Profile created successfully!' });
-  //   });
+  //   const roles = req.body.roles;
+  //   if (roles.includes('learner')) {
+  //     const profile = new Profile({
+  //       id_user: userId,
+  //       userinfo: req.body.userinfo,
+  //       education: req.body.education,
+  //       experience: req.body.experience,
+  //       skills: req.body.skills,
+  //       languages: req.body.languages,
+  //       interests: req.body.interests,
+  //       certifications: req.body.certifications,
+  //       projects: req.body.projects,
+  //     });
+  //     console.log(profile);
+  //     profile.save((err, profile) => {
+  //       if (err) {
+  //         res.status(500).send({ message: err });
+  //         return;
+  //       }
+  //       res.send({ message: 'Profile created successfully!' });
+  //     });
+  //   } else {
+  //     res.status(403).send({ message: 'Forbidden' });
+  //   }
   // });
 
   // app.post('/api/users/:id/profile/new', (req, res) => {s
@@ -73,43 +89,68 @@ module.exports = function (app) {
 
   // Update Profile
   //POST => “/users/:id/profile/edit”
-  app.post('/api/users/:id/profile/edit', (req, res) => {
-    //const userId = req.params.id;
-    const profileId = mongoose.Types.ObjectId(req.params.id);
-    const userinfo = req.body.userinfo;
-    const education = req.body.education;
-    const experience = req.body.experience;
-    const skills = req.body.skills;
-    const languages = req.body.languages;
-    const certifications = req.body.certifications;
-    const projects = req.body.projects;
-    const interests = req.body.interests;
-    Profile.findById(profileId, (err, profile) => {
-      if (err) {
-        res.status(500).send({ message: err });
-        return;
+  app.post('/api/users/:id/profile/edit', async (req, res) => {
+    const user = await User.findById(req.params.id).populate('role');
+    console.log(user);
+    if (
+      user.roles[0]._id == '62948da8500a9007cf43333a' ||
+      user.roles[0]._id == '62948da8500a9007cf43333b'
+    ) {
+      //edit profile
+      try {
+        const editedProfile = await Profile.findByIdAndUpdate(
+          user.profile,
+          req.body
+        );
+        res.send({ success: `profile edited successfully: ${editedProfile}` });
+      } catch (error) {
+        res.send({ error: error });
       }
-      if (profile) {
-        profile.userinfo = userinfo;
-        profile.education = education;
-        profile.experience = experience;
-        profile.skills = skills;
-        profile.languages = languages;
-        profile.certifications = certifications;
-        profile.projects = projects;
-        profile.interests = interests;
-        profile.save((err, profile) => {
-          if (err) {
-            res.status(500).send({ message: err });
-            return;
-          }
-          res.send({ message: 'Profile updated successfully!' });
-        });
-      } else {
-        res.status(404).send({ message: 'Profile not found!' });
-      }
-    });
+    } else {
+      console.log(user.role._id);
+      res.send({
+        error: 'you dont have the sufficent access to perform this task',
+      });
+    }
   });
+
+  // app.post('/api/users/:id/profile/edit', (req, res) => {
+  //   //const userId = req.params.id;
+  //   const profileId = mongoose.Types.ObjectId(req.params.id);
+  //   const userinfo = req.body.userinfo;
+  //   const education = req.body.education;
+  //   const experience = req.body.experience;
+  //   const skills = req.body.skills;
+  //   const languages = req.body.languages;
+  //   const certifications = req.body.certifications;
+  //   const projects = req.body.projects;
+  //   const interests = req.body.interests;
+  //   Profile.findById(profileId, (err, profile) => {
+  //     if (err) {
+  //       res.status(500).send({ message: err });
+  //       return;
+  //     }
+  //     if (profile) {
+  //       profile.userinfo = userinfo;
+  //       profile.education = education;
+  //       profile.experience = experience;
+  //       profile.skills = skills;
+  //       profile.languages = languages;
+  //       profile.certifications = certifications;
+  //       profile.projects = projects;
+  //       profile.interests = interests;
+  //       profile.save((err, profile) => {
+  //         if (err) {
+  //           res.status(500).send({ message: err });
+  //           return;
+  //         }
+  //         res.send({ message: 'Profile updated successfully!' });
+  //       });
+  //     } else {
+  //       res.status(404).send({ message: 'Profile not found!' });
+  //     }
+  //   });
+  // });
 
   // app.post('/api/users/:id/profile/edit', (req, res) => {
   //   const userId = req.params.id;

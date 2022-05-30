@@ -21,6 +21,15 @@ module.exports = function (app) {
     ],
     controller.signup
   );
+  // company signup route
+  app.post(
+    '/api/auth/signup/company',
+    [
+      verifySignUp.checkDuplicateUsernameOrEmail,
+      verifySignUp.checkRolesExisted,
+    ],
+    controller.signupCompany
+  );
 
   app.post('/api/auth/signin', controller.signin);
 

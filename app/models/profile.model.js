@@ -6,13 +6,13 @@ const profileSchema = new mongoose.Schema({
   id: {
     type: String,
   },
-  userinfo: [
-    {
-      name: String,
-      position: String,
-      location: String,
-    },
-  ],
+  userinfo: {
+    name: String,
+    position: String,
+    location: String,
+    profile_pic: String,
+  },
+
   education: [
     {
       type: String,
@@ -81,6 +81,13 @@ const profileSchema = new mongoose.Schema({
   id_user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
+  },
+  contact: {
+    email: String,
+    phone: String,
+    GitHub: String,
+    LinkedIn: String,
+    CV: String,
   },
 });
 

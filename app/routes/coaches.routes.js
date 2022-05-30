@@ -97,7 +97,8 @@ module.exports = function (app) {
   //   });
   // });
 
-  // check if user is a coach to create a new promotion
+  // check if user is a coach in the database to create a new promotion
+
   app.post('/api/promotions/new', (req, res) => {
     const promotionId = req.params.id;
     const roles = req.body.roles;
@@ -153,89 +154,89 @@ module.exports = function (app) {
 
   /* this is the old code and it works but it is not the best way to do it*/
   // POST => “/users/:id/addUserToPromo/promotion/:id”
-  app.post('/api/users/:id/addUserToPromo/promotion/:id', (req, res) => {
-    const userId = req.params.id;
-    const roles = req.body.roles;
-    const promotionId = req.body.promotionId;
-    Promotion.findById(promotionId, (err, Promotion) => {
-      if (roles.includes('coach')) {
-        if (err) {
-          res.status(500).send({ message: err });
-          return;
-        }
-        if (!Promotion) {
-          res.status(404).send({ message: 'Promotion not found!' });
-          return;
-        }
-        User.findById(userId, (err, user) => {
+  app.post(
+    '/api/users/:id/addUserToPromo/promotion/:id',
+    [authJwt.verifyToken, authJwt.isCoach],
+    (req, res) => {
+      const userId = req.params.id;
+      const roles = req.body.roles;
+      const promotionId = req.body.promotionId;
+      Promotion.findById(promotionId, (err, Promotion) => {
+        if (roles.includes('coach')) {
           if (err) {
             res.status(500).send({ message: err });
             return;
           }
-          if (!user) {
-            res.status(404).send({ message: 'User not found!' });
+          if (!Promotion) {
+            res.status(404).send({ message: 'Promotion not found!' });
             return;
           }
-          Promotion.learners.push(user._id).userId;
-          Promotion.save((err, promotion) => {
+          User.findById(userId, (err, user) => {
             if (err) {
               res.status(500).send({ message: err });
               return;
             }
-            res.send({ message: 'User added to promotion successfully!' });
+            if (!user) {
+              res.status(404).send({ message: 'User not found!' });
+              return;
+            }
+            Promotion.learners.push(user._id).userId;
+            Promotion.save((err, promotion) => {
+              if (err) {
+                res.status(500).send({ message: err });
+                return;
+              }
+              res.send({ message: 'User added to promotion successfully!' });
+            });
           });
-        });
-      } else {
-        res.status(401).send({
-          message: 'You are not authorized to add user to a promotion.',
-        });
-      }
-    });
+        } else {
+          res.status(401).send({
+            message: 'You are not authorized to add user to a promotion.',
+          });
+        }
+      });
 
-    // Coach can Create a new company user
-    //POST => users/company/new
-    app.post('/api/users/company/new', (req, res) => {
-      const roles = req.body.roles;
-      if (roles.includes('coach')) {
-        const user = new User({
-          firstName: req.body.firstName,
-          lastName: req.body.lastName,
-          email: req.body.email,
-          password: req.body.password,
-          roles: req.body.roles,
-          id_company: req.body.id_company,
-        });
-        user.save((err, user) => {
-          if (err) {
-            res.status(500).send({ message: err });
-            return;
-          }
-          res.send({ message: 'User created successfully!' });
-        });
-      } else {
-        res
-          .status(401)
-          .send({ message: 'You are not authorized to create a user.' });
-      }
-    });
+      // Coach can Create a new company user
+      //POST => users/company/new
+      app.post(
+        '/api/users/company/new/',
+        [authJwt.verifyToken, authJwt.isCoach],
+        (req, res) => {
+          const user = new User({
+            username: req.body.username,
+            email: req.body.email,
+            password: req.body.password,
+            roles: req.body.roles,
+            //id_company: req.body.id_company,
+          });
+          user.save((err, user) => {
+            if (err) {
+              res.status(500).send({ message: err });
+              return;
+            }
+            res.send({ message: 'User created successfully!' });
+          });
+        }
+      );
+    }
+  );
 
-    //   app.post('/api/users/company/new', (req, res) => {
-    //     const userId = req.params.id;
-    //     const company = new User({
-    //       userId,
-    //       company: req.body.company,
-    //       email: req.body.email,
-    //       password: req.body.password,
-    //       // id_role: req.body.id_role,
-    //     });
-    //     console.log(company);
-    //     company.save((err, company) => {
-    //       if (err) {
-    //         res.status(500).send({ message: err });
-    //         return;
-    //       }
-    //       res.send({ message: 'Company created successfully!' });
-    //     });
-    //   });
-  });
+  //   app.post('/api/users/company/new', (req, res) => {
+  //     const userId = req.params.id;
+  //     const company = new User({
+  //       userId,
+  //       company: req.body.company,
+  //       email: req.body.email,
+  //       password: req.body.password,
+  //       // id_role: req.body.id_role,
+  //     });
+  //     console.log(company);
+  //     company.save((err, company) => {
+  //       if (err) {
+  //         res.status(500).send({ message: err });
+  //         return;
+  //       }
+  //       res.send({ message: 'Company created successfully!' });
+  //     });
+  //   });
 };

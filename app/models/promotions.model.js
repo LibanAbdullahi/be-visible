@@ -74,3 +74,9 @@ module.exports = Promotion;
 //       });
 //     });
 //   });
+
+// Role.find({ _id: { $in: userId.roles } }, (err, roles) => {
+//   if (err) {                                                                         Role.find({ _id: { $in: userId.roles } }, (err, roles) => {
+//   if (err) {
+//     res.status(500).send({ message: err });
+//     retur
