@@ -61,7 +61,7 @@ module.exports = function (app) {
   //       id_user: userId,
   //       userinfo: req.body.userinfo,
   //       education: req.body.education,
-  //       experience: req.body.experience,
+  //       experience: req.body.experience,&
   //       skills: req.body.skills,
   //       languages: req.body.languages,
   //       interests: req.body.interests,
@@ -191,14 +191,14 @@ module.exports = function (app) {
   // app.get('/api/users/:id/profile', authJwt.verifyToken, (re
 
   app.get('/api/users/:id/profile/', authJwt.verifyToken, (req, res) => {
-    const profileId = mongoose.Types.ObjectId(req.params.id);
-    Profile.findById(profileId, (err, profile) => {
+    const userId = mongoose.Types.ObjectId(req.params.id);
+    const profile = Profile.findOne({ id_user: userId }, (err, profile) => {
       if (err) {
         res.status(500).send({ message: err });
         return;
       }
       if (profile) {
-        res.send(profile);
+        res.send({ profile });
       } else {
         res.status(404).send({ message: 'Profile not found!' });
       }

@@ -4,9 +4,11 @@ const config = require('../config/auth.config');
 const db = require('../models');
 const User = db.user;
 const Role = db.role;
+const Profile = require('../models/profile.model');
 
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
+const { user } = require('../models');
 //const { role } = require('../models');
 /*
 exports.signup = async (req, res) => {
@@ -104,7 +106,48 @@ exports.signup = async (req, res) => {
   };
 */
 
-exports.signup = (req, res) => {
+const newProfile = {
+  userinfo: {
+    name: 'Name',
+    position: 'Position',
+    location: 'Location',
+    otw: false,
+    profile_pic: '',
+  },
+  about: {
+    content: 'This is the about section',
+  },
+  experience: [
+    {
+      position: 'Position',
+      company: 'Company',
+      date: '2022-2022',
+      bulletpoints: ['New Bullet Point'],
+      image: '',
+    },
+  ],
+  education: [
+    {
+      university: 'University',
+      degree: 'Degree',
+      date: '2022-2022',
+      bulletpoints: ['New Bullet Point'],
+      image: '',
+    },
+  ],
+  skills: [],
+  projects: [],
+  languages: [],
+  contact: {
+    email: 'email@email.com',
+    phone: '32000000000',
+    LinkedIn: 'username',
+    GitHub: 'username',
+    CV: 'link',
+  },
+};
+
+exports.signup = async (req, res) => {
   const user = new User({
     username: req.body.username,
     email: req.body.email,
@@ -116,65 +159,63 @@ exports.signup = (req, res) => {
       res.status(500).send({ message: err });
       return;
     }
-
-    if (req.body.roles) {
-      Role.find(
-        {
-          name: { $in: req.body.roles },
-        },
-        (err, roles) => {
-          if (err) {
-            res.status(500).send({ message: err });
-            return;
-          }
-
-          user.roles = roles.map(role => role._id);
-          user.save(err => {
-            if (err) {
-              res.status(500).send({ message: err });
-              return;
-            }
-
-            res.send({ message: 'User was registered successfully!' });
-          });
-        }
-      );
-    } else {
-      Role.findOne({ name: 'user' }, (err, role) => {
+    Role.find(
+      {
+        name: { $in: req.body.roles },
+      },
+      (err, roles) => {
         if (err) {
           res.status(500).send({ message: err });
           return;
         }
-
-        user.roles = [role._id];
+        user.roles = roles.map(role => role._id);
         user.save(err => {
           if (err) {
             res.status(500).send({ message: err });
             return;
           }
-
-          res.send({ message: 'User was registered successfully!' });
         });
-      });
-    }
+      }
+    );
   });
+  const profile = await new Profile({
+    userinfo: newProfile.userinfo,
+    education: newProfile.education,
+    experience: newProfile.experience,
+    skills: newProfile.skills,
+    languages: newProfile.languages,
+    // certifications: req.body.certifications,
+    id_user: user._id,
+    contact: newProfile.contact,
+  });
+  try {
+    await profile.save();
+    await res.send({
+      message: `User and profile have been created `,
+    });
+  } catch (err) {
+    res.status(500).send({ message: err });
+  }
 };
 
 // sign up route for company
 exports.signupCompany = async (req, res) => {
-  const coach = await User.findById(req.body.id).populate('role');
-  if (coach.roles._id == '62948da8500a9007cf43333b') {
+  //check privilege
+  const user = await User.findById(req.params.id).populate('roles');
+  console.log(user);
+  if (user.roles[0]._id == '62948da8500a9007cf43333a') {
     const users = await User.find({ email: req.body.email });
     console.log(users.length);
 
     if (users.length === 0) {
       const user = new User({
+        username: req.body.username,
         email: req.body.email,
         password: bcrypt.hashSync(req.body.password, 8),
       });
 
       const role = await Role.findOne({ title: 'company' });
-      user.role = role._id;
+      user.roles[0]._id;
       console.log(user._id);
       await user.save((err, user) => {
         if (err) {
@@ -191,7 +232,7 @@ exports.signupCompany = async (req, res) => {
     }
   } else {
     console.log(admin.role._id);
-    res.send({ error: 'you are not authorized' });
+    res.send({ error: 'you dont have access to this path' });
   }
 };
 

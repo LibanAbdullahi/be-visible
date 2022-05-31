@@ -11,73 +11,44 @@ const profileSchema = new mongoose.Schema({
     position: String,
     location: String,
     profile_pic: String,
+    otw: Boolean,
+  },
+  about: {
+    content: String,
   },
 
   education: [
     {
-      type: String,
-      detail: {
-        major: String,
-        degree: String,
-        grade: String,
-        startdate: Date,
-        enddate: Date,
-        remarks: String,
-      },
+      degree: String,
+      university: String,
+      date: String,
+      bulletpoints: [String],
+      image: String,
     },
   ],
   experience: [
     {
-      type: String,
-      detail: {
-        position: String,
-        company: String,
-        dateofjoin: String,
-        dateofretire: String,
-        location: String,
-        responsibilities: [{ type: String }],
-        description: String,
-      },
+      position: String,
+      company: String,
+      date: String,
+      bulletpoints: [String],
+      image: String,
     },
   ],
   skills: [
     {
       type: String,
-      detail: {
-        skill: String,
-        level: String,
-      },
     },
   ],
   certifications: [
-    {
-      type: String,
-      detail: {
-        certification: String,
-        date: String,
-        issuer: String,
-      },
-    },
+    { type: mongoose.Schema.Types.ObjectId, ref: 'CoachCertification' },
   ],
   languages: [
     {
       type: String,
-      detail: {
-        language: String,
-        level: String,
-      },
     },
   ],
   projects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }],
-  interests: [
-    {
-      type: String,
-      detail: {
-        interest: String,
-        level: String,
-      },
-    },
-  ],
   id_user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
