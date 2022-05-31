@@ -98,7 +98,7 @@ module.exports = function (app) {
   // });
 
   // check if user is a coach in the database to create a new promotion
-  app.post('/api/promotions/new', authJwt.verifyToken, async (req, res) => {
+  app.post('/api/promotions/new', [authJwt.verifyToken], async (req, res) => {
     const user = await User.findById(req.body.id).populate('roles');
     console.log(user);
     if (user.roles[0]._id == '62948da8500a9007cf43333b') {
@@ -181,7 +181,7 @@ module.exports = function (app) {
   // POST => “/users/:id/addUserToPromo/promotion/:id”
   app.post(
     '/api/users/:id/addUserToPromo/promotion/',
-    [authJwt.verifyToken, authJwt.isCoach],
+    [authJwt.verifyToken],
     async (req, res) => {
       const coach = await User.findById(req.params.id).populate('roles');
       console.log(coach);
