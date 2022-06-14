@@ -9,7 +9,7 @@ module.exports = function (app) {
     next();
   });
 
-  app.get('/api/users/all', controller.allAccess);
+  // app.get('/api/users/all', controller.allAccess);
 
   // app.get(
   //   '/api/users/:id/profile',

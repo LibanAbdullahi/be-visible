@@ -191,31 +191,53 @@ module.exports = function (app) {
     '/api/users/:id/profile/add_project',
     [authJwt.verifyToken],
     (req, res) => {
-      const profileId = mongoose.Types.ObjectId(req.params.id);
+      const userId = mongoose.Types.ObjectId(req.params.id);
       const project = new Project({
-        id_user: profileId,
+        id_user: userId,
         name: req.body.name,
         description: req.body.description,
         link: req.body.link,
         image: req.body.image,
       });
-      console.log(project);
-      Profile.findById(profileId, (err, profile) => {
+      Profile.findOne({ id_user: userId }, (err, profile) => {
         if (err) {
           res.status(500).send({ message: err });
           return;
         }
-        profile.projects.push(project);
-        profile.save((err, profile) => {
-          if (err) {
-            res.status(500).send({ message: err });
-            return;
-          }
-          res.send({ message: 'Project added successfully!' });
-        });
+        if (profile) {
+          profile.projects.push(project);
+          profile.save((err, profile) => {
+            if (err) {
+              res.status(500).send({ message: err });
+              return;
+            }
+            res.send({ message: 'Project added successfully!' });
+          });
+        } else {
+          res.status(404).send({ message: 'Profile not found!' });
+        }
       });
     }
   );
+
+  //     console.log('Test dHQSUG', project);
+  //     Profile.findById(profileId, (err, profile) => {
+  //       if (err) {
+  //         res.status(500).send({ message: err });
+  //         return;
+  //       }
+  //       console.log('profile', profile);
+  //       profile.projects.push(project);
+  //       profile.save((err, profile) => {
+  //         if (err) {
+  //           res.status(500).send({ message: err });
+  //           return;
+  //         }
+  //         res.send({ message: 'Project added successfully!' });
+  //       });
+  //     });
+  //   }
+  // );
 
   // Get all informations from one profile
   //GET => “/users/:id/profile/ make sure access is protected

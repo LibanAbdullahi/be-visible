@@ -184,6 +184,7 @@ exports.signup = async (req, res) => {
     experience: newProfile.experience,
     skills: newProfile.skills,
     languages: newProfile.languages,
+    about: newProfile.about,
     // certifications: req.body.certifications,
     id_user: user._id,
     contact: newProfile.contact,

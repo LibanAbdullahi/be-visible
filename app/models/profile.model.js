@@ -41,7 +41,11 @@ const profileSchema = new mongoose.Schema({
     },
   ],
   certifications: [
-    { type: mongoose.Schema.Types.ObjectId, ref: 'CoachCertification' },
+    {
+      topic: String,
+      message: String,
+      badge_picture: String,
+    },
   ],
   languages: [
     {
@@ -54,6 +58,13 @@ const profileSchema = new mongoose.Schema({
       description: String,
       link: String,
       image: String,
+    },
+  ],
+  promotions: [
+    {
+      name: String,
+      description: String,
+      date: String,
     },
   ],
   id_user: {
