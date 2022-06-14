@@ -106,60 +106,7 @@ module.exports = function (app) {
     }
   });
 
-  // app.post('/api/promotions/new', (req, res) => {
-  //   const promotionId = req.params.id;
-  //   const roles = req.body.roles;
-  //   if (roles.includes('coach')) {
-  //     const promotion = new Promotion({
-  //       promotionId,
-  //       promotion: req.body.promotion,
-  //       name: req.body.name,
-  //       description: req.body.description,
-  //       date: req.body.date,
-  //       badge_picture: req.body.badge_picture,
-  //       id_coach: req.body.id_coach,
-  //     });
-  //     console.log(promotion);
-  //     promotion.save((err, promotion) => {
-  //       if (err) {
-  //         res.status(500).send({ message: err });
-  //         return;
-  //       }
-  //       res.send({ message: 'Promotion created successfully!' });
-  //     });
-  //   } else {
-  //     res
-  //       .status(401)
-  //       .send({ message: 'You are not authorized to create a promotion.' });
-  //   }
-  // });
-
-  // only coach can create a new promotion
-  // app.post('/api/promotions/new', (req, res) => {
-  //   const promotionId = req.params.id;
-  //   const promotion = new Promotion({
-  //     promotionId,
-  //     promotion: req.body.promotion,
-  //     name: req.body.name,
-  //     description: req.body.description,
-  //     date: req.body.date,
-  //     image: req.body.image,
-  //     id_coach: req.body.id_coach,
-  //   });
-  //   console.log(promotion);
-  //   promotion.save((err, promotion) => {
-  //     if (err) {
-  //       res.status(500).send({ message: err });
-  //       return;
-  //     }
-  //     res.send({ message: 'Promotion created successfully!' });
-  //   });
-  // });
-
-  // Assign learner That does not have a promotion yet to promotion
-  // POST => “/users/:id/addUserToPromo/promotion/:id
-
-  /* this is the old code and it works but it is not the best way to do it*/
+  // check if user is a coach in the database to create a new promotion
   // POST => “/users/:id/addUserToPromo/promotion/:id”
   app.post(
     '/api/users/:id/addUserToPromo/promotion',
@@ -199,22 +146,7 @@ module.exports = function (app) {
     }
   );
 
-  //     promotion.learners.push(user._id);
-  //     promotion.save();
-  //     res.send({
-  //       success: 'Learner added to promotion successfully',
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //     res.send({ error: error });
-  //   }
-  // } else {
-  //   console.log(coach.roles[0]._id);
-  //   res.send({
-  //     error:
-  //       'you dont have enough permissions to add a user to a promotion',
-  //   });
-  // }
+  // check if user is a coach in the database to create a new company user
 
   // Coach can Create a new company user
   //POST => users/company/new

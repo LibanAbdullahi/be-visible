@@ -33,50 +33,5 @@ const PromotionSchema = new mongoose.Schema({
 });
 
 const Promotion = mongoose.model('Promotion', PromotionSchema);
-// // const promotion = new Promotion({
-// //   id: '1',
-// //   name: 'Johnson-7',
-// //   // iteration: '1',
-// // });
-// promotion.save();
 
 module.exports = Promotion;
-
-// POST => “/users/:id/addUserToPromo/promotion/:id”
-//  app.post('/api/users/:id/addUserToPromo/promotion/:id', (req, res) => {
-//   const userId = req.params.id;
-//   const promotionId = req.body.promotionId;
-//   Promotion.findById(promotionId, (err, Promotion) => {
-//     if (err) {
-//       res.status(500).send({ message: err });
-//       return;
-//     }
-//     if (!Promotion) {
-//       res.status(404).send({ message: 'Promotion not found!' });
-//       return;
-//     }
-//     User.findById(userId, (err, user) => {
-//       if (err) {
-//         res.status(500).send({ message: err });
-//         return;
-//       }
-//       if (!user) {
-//         res.status(404).send({ message: 'User not found!' });
-//         return;
-//       }
-//       Promotion.learners.push(user._id);
-//       Promotion.save((err, Promotion) => {
-//         if (err) {
-//           res.status(500).send({ message: err });
-//           return;
-//         }
-//         res.send({ message: 'User added to promotion successfully!' });
-//       });
-//     });
-//   });
-
-// Role.find({ _id: { $in: userId.roles } }, (err, roles) => {
-//   if (err) {                                                                         Role.find({ _id: { $in: userId.roles } }, (err, roles) => {
-//   if (err) {
-//     res.status(500).send({ message: err });
-//     retur
